@@ -23,3 +23,5 @@ Uses sdl2 as canvas: http://libsdl.org/
 Compile and run with
 gcc  -I /usr/local/include/SDL2 -lSDL2 game_of_colors.c -o game_of_colors &&
 ./game_of_colors
+
+[Screen_Shot](images/Screen_Shot.png)
