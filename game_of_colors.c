@@ -1,23 +1,25 @@
 
+// gcc  -I /usr/local/include/SDL2 -lSDL2 game_of_colors.c -o game_of_colors && ./game_of_colors
+
 // #include "SDL.h"
 #include <SDL.h>
 #include <stdio.h>
+
 SDL_Surface *surface;
 SDL_Window *window; 
 SDL_Renderer *renderer;
 
 // const int SCREEN_WIDTH = 1600;
 // const int SCREEN_HEIGHT = 1000;
-// const int SCREEN_WIDTH = 800;
-// const int SCREEN_HEIGHT = 800;
-const int SCREEN_WIDTH = 400;
-const int SCREEN_HEIGHT = 400;
-
+const int SCREEN_WIDTH = 800;
+const int SCREEN_HEIGHT = 800;
+// const int SCREEN_WIDTH = 400;
+// const int SCREEN_HEIGHT = 400;
 // const int SCREEN_WIDTH = 1280;
 // const int SCREEN_HEIGHT = 1024;
-// const int SCREEN_BPP = 32;
+
 const int BYTES_PER_PIXEL=4;
-int pitch=1000;
+int pitch=SCREEN_WIDTH;
 int iteration=0;
 float f=0;// coupling factor
 
@@ -66,8 +68,11 @@ Uint8 get_b(int x, int y){
 
 uint calc(int x, int y){
 	
-	// if(x==400&&y==400)return rand();
-	// if(rand()%100<2)return rand();
+	// r,g,b color values around center 'c11'
+	// 00 10 20
+	// 01 11 21
+	// 02 12 22
+	
 	uint c00=get(x-1,y-1);
 	uint c01=get(x-1,y);
 	uint c02=get(x-1,y+1);
@@ -77,6 +82,8 @@ uint calc(int x, int y){
 	uint c20=get(x+1,y-1);
 	uint c21=get(x+1,y);
 	uint c22=get(x+1,y+1);
+	
+	// red
 	uint r00=get_r(x-1,y-1);
 	uint r01=get_r(x-1,y)  ;
 	uint r02=get_r(x-1,y+1);
@@ -86,6 +93,8 @@ uint calc(int x, int y){
 	uint r20=get_r(x+1,y-1);
 	uint r21=get_r(x+1,y)  ;
 	uint r22=get_r(x+1,y+1);
+	
+	// green
 	uint g00=get_g(x-1,y-1);
 	uint g01=get_g(x-1,y)  ;
 	uint g02=get_g(x-1,y+1);
@@ -95,6 +104,8 @@ uint calc(int x, int y){
 	uint g20=get_g(x+1,y-1);
 	uint g21=get_g(x+1,y)  ;
 	uint g22=get_g(x+1,y+1);
+	
+	// blue
 	uint b00=get_b(x-1,y-1);
 	uint b01=get_b(x-1,y)  ;
 	uint b02=get_b(x-1,y+1);
@@ -104,51 +115,50 @@ uint calc(int x, int y){
 	uint b20=get_b(x+1,y-1);
 	uint b21=get_b(x+1,y)  ;
 	uint b22=get_b(x+1,y+1);
+	
+	// center colors of THIS dot
 	uint r=r11;
 	uint g=g11;
 	uint b=b11;
-	// if(rand()%100<80)return (int) (c10+c01+c21+c12)/4;
-	// if(rand()%100<20)
+	
+	// random colors
 	uint zr=rand()%256;
 	uint zg=rand()%256;
-	uint zb=rand()%256;
-	float h=100.0;
-	// uint r0=((r10+r01+r11+r21+r12)/5);
-	// uint g0=((g10+g01+g11+g21+g12)/5);
-	// uint b0=(b10+b01+b11+b21+b12)/5;
+	uint zb=rand()%256;	
+	
+	// mean color value of surrounding
 	uint r0=((r10+r01+r21+r12)/4);
 	uint g0=((g10+g01+g21+g12)/4);
 	uint b0=(b10+b01+b21+b12)/4;
+	
+	// Including this dot
+	// uint r0=((r10+r01+r11+r21+r12)/5);
+	// uint g0=((g10+g01+g11+g21+g12)/5);
+	// uint b0=(b10+b01+b11+b21+b12)/5;
+	
 	float fr=r0/256.0;
 	float fg=g0/256.0;
 	float fb=b0/256.0;
+	
 	uint k=128;
+	float h=100.0;
 
-	if(r+b0<k/2)b=0;
-	else if(b0>k)b=0;
-	else if(b11==0&&b0<=k)b=128;
-	// else b=b11;//128;
-	
-	
-	if(r0<=k/2)r=b;
-	if(r0>k)r=0;
-	if(r11==0&&r0<=k)r=128;
-	
-	if(g0<=k/2)g=b;
-	if(g0>k)g=r;
-	if(g11==0&&g0<=k)g=128;
-	
-	g=g22;
-	
-	// if(b00==128 && r22==k)r=128;
-	// 
-	// if(r==b)r=b=0;
-	// r=g=b;
+//////////
+// done with initialization, 
+// now updated the dot's color based on some crazy experimental whatever function
+// feel free to wildly experiment with this algorithm!
 
-	
+// POPULATION UPDATE
+
+	//  inspired by Conway's game of life:
+
+	//  if there is a sufficient population, then grow in numbers:
 	if(b0>=100)b=b0*1.01;
-	if(b0<100)b=b0*(0.99-fr/h);
+	//  if the population is small then shrink
+	if(b0<100)b=b0*(0.99-fr/100);
+	//  if the population is too big then collapse
 	if(b0>240)b=0;
+	//  repopulate collapsed populations
 	if(b0<3)b=120;//zb*((1.5-f)+fr*f);
 	
 	if(r0>=100)r=r0*1.01;
@@ -161,15 +171,14 @@ uint calc(int x, int y){
 	if(g11>240){g=0;b=b/2;}
 	if(g11<3)g=120*(1-fb*fr);//zb*((1.5-f)+fr*f);
 
-	// int t=b;
-	// b=g;
-	// g=t;
-	 	
+// END OF POPULATION UPDATE 
+
 	if(r>255)r=255;
 	if(g>255)g=255;
 	if(b>255)b=255;
 	return (r<<16)+(g<<8)+b;
 }
+
 
 void loop(){
 	iteration++;
