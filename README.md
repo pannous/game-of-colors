@@ -20,5 +20,6 @@ for example b=b0*(0.99-fr/100) == shrink blue faster when there is more green
 	
 Uses sdl2 as canvas: http://libsdl.org/
 
-gcc  -I /usr/local/include/SDL2 -lSDL2 game_of_colors.c -o game_of_colors 
+Compile and run with
+gcc  -I /usr/local/include/SDL2 -lSDL2 game_of_colors.c -o game_of_colors &&
 ./game_of_colors
