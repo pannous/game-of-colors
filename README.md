@@ -14,4 +14,7 @@ Let colors fight over your screen canvas.
 	
 Updated the dot's color based on some crazy experimental whatever function.
 Feel free to wildly experiment for stunning art!
+
+The fun starts once you couple the different colours,
+for example b=b0*(0.99-fr/100) == shrink blue faster when there is more green
 	
