@@ -235,7 +235,7 @@ int main(int argc, char* argv[]) {
 	pitch=surface->pitch;
 	state= SDL_GetKeyboardState(NULL);
 	fill();
-	while(true){
+	while(1){
 		loop();	
 		SDL_PumpEvents();
 		if (state[SDL_SCANCODE_RETURN]||state[SDL_SCANCODE_ESCAPE])exit(0);
